@@ -12,7 +12,8 @@ class Tracker extends Component {
         transactionName: '',
         transactionType: '',
         price: '',
-        currentUID: fire.auth().currentUser.uid
+        currentUID: fire.auth().currentUser.uid,
+        touserid: ''
     }
 
     // logout function
@@ -28,7 +29,7 @@ class Tracker extends Component {
 
     // adding transaction
     addNewTransaction = () => {
-        const {transactionName, transactionType, price, currentUID, money} = this.state;
+        const {touserid,transactionName, transactionType, price, currentUID, money} = this.state;
 
         // validation
         if(transactionName && transactionType && price){
@@ -38,7 +39,8 @@ class Tracker extends Component {
                 name: transactionName,
                 type: transactionType,
                 price: price,
-                user_id: currentUID
+                user_id: currentUID,
+                to_uid: touserid
             });
             
             fire.database().ref('Transactions/' + currentUID).push({
@@ -46,7 +48,8 @@ class Tracker extends Component {
                 name: transactionName,
                 type: transactionType,
                 price: price,
-                user_id: currentUID
+                user_id: currentUID,
+                to_uid: touserid
             }).then((data) => {
                 console.log('success');
                 this.setState({
@@ -55,6 +58,45 @@ class Tracker extends Component {
                     transactionName: '',
                     transactionType: '',
                     price: ''
+                })
+            }).catch((error)=>{
+                console.log('error ' , error)
+            });
+
+        }
+    }
+
+    addNewTransaction = () => {
+        const {touserid,transactionName, transactionType, price, currentUID, money} = this.state;
+
+        // validation
+        if(transactionName && transactionType && price){
+            const BackUpState = this.state.transactions;
+            BackUpState.push({
+                id: BackUpState.length + 1,
+                name: transactionName,
+                type: transactionType,
+                price: price,
+                user_id: currentUID,
+                to_uid: touserid
+            });
+            
+            fire.database().ref('Transactions/' + touserid).push({
+                id: BackUpState.length,
+                name: transactionName,
+                type: transactionType,
+                price: price,
+                to_uid: touserid,
+                from: currentUID
+            }).then((data) => {
+                console.log('success');
+                this.setState({
+                    transactions: BackUpState,
+                    money: transactionType === 'deposit' ? money + parseFloat(price) : money - parseFloat(price),
+                    transactionName: '',
+                    transactionType: '',
+                    price: '',
+                    to_uid: touserid ? fire.
                 })
             }).catch((error)=>{
                 console.log('error ' , error)
@@ -109,6 +151,13 @@ class Tracker extends Component {
                                 onChange={this.handleChange('transactionName')}
                                 value={this.state.transactionName}
                                 placeholder="Transaction Name"
+                                type="text"
+                                name="transactionName"
+                            />
+                            <input
+                                onChange={this.handleChange('transactionName')}
+                                value={this.state.transactionName}
+                                placeholder="Send to user id"
                                 type="text"
                                 name="transactionName"
                             />
