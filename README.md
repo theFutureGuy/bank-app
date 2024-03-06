@@ -1,4 +1,4 @@
-# BANK APP
+# BANK APP (Hackathon Project)
 here this app manages all the transactions and logged as a personal atomic details.
 * I have used firebase for realtime database and authentication(Simple username and password)
 * Stored in database and succesfully fetched whenever you login.
